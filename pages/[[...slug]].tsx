@@ -1,10 +1,13 @@
-import { isAddress } from '@ethersproject/address'
-import { Text } from '@geist-ui/core'
+import { Spacer, Text } from '@geist-ui/core'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
+import { AddressInput } from '../components/AddressInput'
+import { DelegationTree } from '../components/DelegationTree'
 import styles from '../styles/Home.module.css'
-import { getAllDelegations } from '../utils'
+import { tryGetAddress } from '../utils'
+
+const ADDRESS_PLACEHOLDER = 'x'
 
 export default function Home() {
   const router = useRouter()
@@ -13,25 +16,32 @@ export default function Home() {
       ? [router.query.slug]
       : router.query.slug ?? []
 
-  const [delegations, setDelegations] = useState<
-    Awaited<ReturnType<typeof getAllDelegations>>
-  >([])
-  useEffect(() => {
-    if (owner && isAddress(owner) && delegatee && isAddress(delegatee)) {
-      let stale = false
-
-      getAllDelegations(owner, delegatee).then((delegations) => {
-        if (!stale) setDelegations(delegations)
+  const setOwnerOrDelegatee = useCallback(
+    (owner: string | undefined, delegatee: string | undefined) => {
+      const ownerString =
+        owner === undefined || owner === ADDRESS_PLACEHOLDER
+          ? delegatee === undefined
+            ? ''
+            : `/${ADDRESS_PLACEHOLDER}`
+          : `/${owner}`
+      const delegateeString = delegatee ? `/${delegatee}` : ''
+      router.push(`${ownerString}${delegateeString}`, undefined, {
+        scroll: false,
+        shallow: true,
       })
+    },
+    [router]
+  )
 
-      return () => {
-        stale = true
-        setDelegations([])
-      }
-    }
-  }, [owner, delegatee])
+  const setOwner = useCallback(
+    (owner: string | undefined) => setOwnerOrDelegatee(owner, delegatee),
+    [setOwnerOrDelegatee, delegatee]
+  )
 
-  console.log(delegations)
+  const setDelegatee = useCallback(
+    (delegatee: string | undefined) => setOwnerOrDelegatee(owner, delegatee),
+    [setOwnerOrDelegatee, owner]
+  )
 
   return (
     <>
@@ -45,10 +55,27 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.center}>
           <div>
-            <Text h1 mb={0}>
+            <Text h1 style={{ textAlign: 'center' }}>
               Franchiser
             </Text>
-            <Text p>This is a paragraph.</Text>
+            <Spacer h={1} />
+            <div>
+              <AddressInput
+                label={'Owner'}
+                parentAddress={tryGetAddress(owner)}
+                setParentAddress={setOwner}
+              />
+              <Spacer h={0.5} />
+              <AddressInput
+                label={'Delegatee'}
+                parentAddress={tryGetAddress(delegatee)}
+                setParentAddress={setDelegatee}
+              />
+            </div>
+            <DelegationTree
+              owner={tryGetAddress(owner)}
+              delegatee={tryGetAddress(delegatee)}
+            />
           </div>
         </div>
       </main>

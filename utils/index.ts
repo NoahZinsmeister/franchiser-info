@@ -1,3 +1,4 @@
+import { getAddress } from '@ethersproject/address'
 import type { BigNumber } from '@ethersproject/bignumber'
 import type { ContractFunction } from '@ethersproject/contracts'
 import { Contract } from '@ethersproject/contracts'
@@ -56,4 +57,13 @@ export async function getAllDelegations(owner: string, delegatee: string) {
         )
       )
     )
+}
+
+export function tryGetAddress(address: string | undefined): string | undefined {
+  if (!address) return undefined
+  try {
+    return getAddress(address.toLowerCase())
+  } catch {
+    return undefined
+  }
 }
