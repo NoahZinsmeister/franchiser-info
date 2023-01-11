@@ -54,12 +54,12 @@ export default function Home() {
 
       <main className={styles.main}>
         <div className={styles.center}>
-          <div>
+          <div style={{ width: '100%', maxWidth: '100%' }}>
             <Text h1 style={{ textAlign: 'center' }}>
               Franchiser
             </Text>
-            <Spacer h={1} />
-            <div>
+            <Spacer h={3} />
+            <div style={{ width: 'fit-content' }}>
               <AddressInput
                 label={'Owner'}
                 parentAddress={tryGetAddress(owner)}
@@ -72,6 +72,7 @@ export default function Home() {
                 setParentAddress={setDelegatee}
               />
             </div>
+            <Spacer h={2} />
             <DelegationTree
               owner={tryGetAddress(owner)}
               delegatee={tryGetAddress(delegatee)}

@@ -12,11 +12,17 @@
   justify-content: center;
   align-items: center;
   position: relative;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Mobile */
 @media (max-width: 700px) {
+  .main {
+    padding: 1rem;
+  }
+
   .center {
-    padding: 8rem 0 6rem;
+    padding: 4rem 0;
   }
 }

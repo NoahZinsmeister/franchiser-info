@@ -33,18 +33,39 @@ export function DelegationTree({
   return delegations === undefined ? null : delegations.length === 0 ? (
     <Text p>No delegations found.</Text>
   ) : (
-    <Tree>
-      {delegations.map((row, i) =>
-        row.map((column, j) => {
-          return (
-            <Tree.File
-              key={`${i}${j}`}
-              name={column.delegatee}
-              extra={`${formatEther(column.votes)} votes`}
-            />
-          )
-        })
-      )}
+    <Tree
+      initialExpand={true}
+      style={{
+        overflow: 'scroll',
+      }}
+    >
+      <Tree.Folder
+        name={delegations[0][0].delegatee}
+        extra={`${
+          delegations[0][0].votes.isZero()
+            ? '0'
+            : formatEther(delegations[0][0].votes)
+        } votes`}
+      >
+        {delegations.slice(1).map((row, i) => {
+          return row.map((column, j) => {
+            const hasChildren = delegations[i + 2]?.some(
+              (d) => d.delegator === column.delegatee
+            )
+            const TreeComponent = hasChildren ? Tree.Folder : Tree.File
+            return (
+              <TreeComponent
+                key={`${i}${j}`}
+                name={column.delegatee}
+                style={{ fontFamily: 'monospace' }}
+                extra={`${
+                  column.votes.isZero() ? '0' : formatEther(column.votes)
+                } votes`}
+              />
+            )
+          })
+        })}
+      </Tree.Folder>
     </Tree>
   )
 }
