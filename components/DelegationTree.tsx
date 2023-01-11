@@ -1,5 +1,5 @@
 import { formatEther } from '@ethersproject/units'
-import { Text, Tree } from '@geist-ui/core'
+import { Loading, Text, Tree } from '@geist-ui/core'
 import { useEffect, useState } from 'react'
 import { getAllDelegations } from '../utils'
 
@@ -28,9 +28,9 @@ export function DelegationTree({
     }
   }, [owner, delegatee])
 
-  console.log(delegations)
-
-  return delegations === undefined ? null : delegations.length === 0 ? (
+  return delegations === undefined ? (
+    <Loading />
+  ) : delegations.length === 0 ? (
     <Text p>No delegations found.</Text>
   ) : (
     <Tree
