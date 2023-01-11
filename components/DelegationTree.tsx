@@ -57,7 +57,6 @@ export function DelegationTree({
               <TreeComponent
                 key={`${i}${j}`}
                 name={column.delegatee}
-                style={{ fontFamily: 'monospace' }}
                 extra={`${
                   column.votes.isZero() ? '0' : formatEther(column.votes)
                 } votes`}
