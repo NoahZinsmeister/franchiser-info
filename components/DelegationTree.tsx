@@ -28,7 +28,8 @@ export function DelegationTree({
     }
   }, [owner, delegatee])
 
-  return delegations === undefined ? (
+  return owner === undefined || delegatee === undefined ? null : delegations ===
+    undefined ? (
     <Loading />
   ) : delegations.length === 0 ? (
     <Text p>No delegations found.</Text>
