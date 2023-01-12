@@ -18,7 +18,7 @@ interface FranchiserLensContract extends Contract {
   }
 }
 
-const provider = new JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL, 1)
+export const provider = new JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL, 1)
 
 export const FranchiserFactory = new Contract(
   FRANCHISER_FACTORY_ADDRESS,

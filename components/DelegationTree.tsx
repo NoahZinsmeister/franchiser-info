@@ -1,7 +1,19 @@
 import { formatEther } from '@ethersproject/units'
 import { Loading, Text, Tree } from '@geist-ui/core'
-import { useEffect, useState } from 'react'
+import { ComponentProps, useEffect, useState } from 'react'
 import { getAllDelegations } from '../utils'
+import { useENSName } from '../utils/hooks'
+
+function TreeComponentWithENS({
+  Component,
+  name,
+  ...rest
+}: (ComponentProps<typeof Tree.Folder> | ComponentProps<typeof Tree.File>) & {
+  Component: typeof Tree.Folder | typeof Tree.File
+}) {
+  const ENSName = useENSName(name)
+  return <Component name={ENSName ?? name} {...rest} />
+}
 
 export function DelegationTree({
   owner,
@@ -38,9 +50,11 @@ export function DelegationTree({
       initialExpand={true}
       style={{
         overflow: 'scroll',
+        maxWidth: 'fit-content',
       }}
     >
-      <Tree.Folder
+      <TreeComponentWithENS
+        Component={Tree.Folder}
         name={delegations[0][0].delegatee}
         extra={`${
           delegations[0][0].votes.isZero()
@@ -53,9 +67,10 @@ export function DelegationTree({
             const hasChildren = delegations[i + 2]?.some(
               (d) => d.delegator === column.delegatee
             )
-            const TreeComponent = hasChildren ? Tree.Folder : Tree.File
+
             return (
-              <TreeComponent
+              <TreeComponentWithENS
+                Component={hasChildren ? Tree.Folder : Tree.File}
                 key={`${i}${j}`}
                 name={column.delegatee}
                 extra={`${
@@ -65,7 +80,7 @@ export function DelegationTree({
             )
           })
         })}
-      </Tree.Folder>
+      </TreeComponentWithENS>
     </Tree>
   )
 }
