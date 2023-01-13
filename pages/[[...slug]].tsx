@@ -1,4 +1,5 @@
-import { Spacer, Text } from '@geist-ui/core'
+import { Link, Spacer, Text } from '@geist-ui/core'
+import Github from '@geist-ui/icons/github'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback } from 'react'
@@ -61,13 +62,13 @@ export default function Home() {
             <Spacer h={3} />
             <div style={{ width: 'fit-content' }}>
               <AddressInput
-                label={'Owner'}
+                label="Owner"
                 parentAddress={tryGetAddress(owner)}
                 setParentAddress={setOwner}
               />
               <Spacer h={0.5} />
               <AddressInput
-                label={'Delegatee'}
+                label="Delegatee"
                 parentAddress={tryGetAddress(delegatee)}
                 setParentAddress={setDelegatee}
               />
@@ -78,6 +79,14 @@ export default function Home() {
               delegatee={tryGetAddress(delegatee)}
             />
           </div>
+        </div>
+        <div>
+          <Link
+            href="https://github.com/NoahZinsmeister/franchiser-info"
+            target="_blank"
+          >
+            <Github />
+          </Link>
         </div>
       </main>
     </>

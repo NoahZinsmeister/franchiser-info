@@ -3,8 +3,8 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 6rem;
-  min-height: 100vh;
+  padding: 4rem;
+  min-height: calc(100vh - 4rem * 2);
 }
 
 .center {
@@ -20,6 +20,7 @@
 @media (max-width: 700px) {
   .main {
     padding: 1rem;
+    min-height: calc(100vh - 1rem * 2);
   }
 
   .center {

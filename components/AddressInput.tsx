@@ -98,7 +98,7 @@ export function AddressInput({
         href={`https://etherscan.io/address/${ENSName ?? displayAddress}`}
         icon
         color
-        target={'_blank'}
+        target="_blank"
       />
     ) : null
 
@@ -108,7 +108,7 @@ export function AddressInput({
       placeholder="0x..."
       size={42}
       maxLength={42}
-      width={'100%'}
+      width="100%"
       style={{ fontFamily: 'monospace' }}
       spellCheck={false}
       value={displayValue}
