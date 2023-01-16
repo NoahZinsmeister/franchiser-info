@@ -80,7 +80,13 @@ export default function Home() {
             />
           </div>
         </div>
-        <div>
+        <div
+          style={{
+            display: 'flex',
+            width: '100%',
+            justifyContent: 'end',
+          }}
+        >
           <Link
             href="https://github.com/NoahZinsmeister/franchiser-info"
             target="_blank"

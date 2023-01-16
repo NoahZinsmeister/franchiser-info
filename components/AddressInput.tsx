@@ -1,6 +1,7 @@
-import { Input, Link } from '@geist-ui/core'
+import { Avatar, Input, Link } from '@geist-ui/core'
 import { FormEvent, useEffect, useReducer } from 'react'
 import { provider, tryGetAddress } from '../utils'
+import { useENSAvatar } from '../utils/hooks'
 
 interface ReducerState {
   value: string
@@ -102,9 +103,16 @@ export function AddressInput({
       />
     ) : null
 
+  const avatar = useENSAvatar(ENSName)
+
   return (
     <Input
       label={label}
+      icon={
+        avatar ? (
+          <Avatar src={avatar} style={{ borderRadius: '100%' }} />
+        ) : undefined
+      }
       placeholder="0x..."
       size={42}
       maxLength={42}
