@@ -8,6 +8,7 @@ import {
   FRANCHISER_FACTORY_ADDRESS,
   FRANCHISER_LENS_ABI,
   FRANCHISER_LENS_ADDRESS,
+  SUSPECTED_ENS_NAMES,
 } from './constants'
 
 interface FranchiserLensContract extends Contract {
@@ -19,6 +20,34 @@ interface FranchiserLensContract extends Contract {
 }
 
 export const provider = new JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL, 1)
+
+export function getENSName(address: string) {
+  return new Promise<string | undefined>((resolve) => {
+    Promise.allSettled([
+      provider.lookupAddress(address).then((ENSName) => {
+        if (ENSName) return ENSName
+        throw new Error()
+      }),
+      new Promise<string>((resolveSuspected) => {
+        const suspectedENSName = SUSPECTED_ENS_NAMES[address]
+        if (!suspectedENSName) throw new Error()
+        provider.resolveName(suspectedENSName).then((resolvedAddress) => {
+          if (resolvedAddress && resolvedAddress === address)
+            return resolveSuspected(suspectedENSName)
+          throw new Error()
+        })
+      }),
+    ]).then(([reverse, suspected]) =>
+      resolve(
+        reverse.status === 'fulfilled'
+          ? reverse.value
+          : suspected.status === 'fulfilled'
+          ? suspected.value
+          : undefined
+      )
+    )
+  })
+}
 
 export const FranchiserFactory = new Contract(
   FRANCHISER_FACTORY_ADDRESS,

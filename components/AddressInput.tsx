@@ -1,6 +1,6 @@
 import { Avatar, Input, Link } from '@geist-ui/core'
 import { FormEvent, useEffect, useReducer } from 'react'
-import { provider, tryGetAddress } from '../utils'
+import { getENSName, provider, tryGetAddress } from '../utils'
 import { useENSAvatar } from '../utils/hooks'
 
 interface ReducerState {
@@ -53,13 +53,14 @@ export function AddressInput({
     if (address) {
       if (address !== parentAddress) setParentAddress(address)
       let stale = false
-      provider
-        .lookupAddress(address)
+
+      getENSName(address)
         .then((ENSName) => {
           if (!stale && ENSName)
             dispatch({ type: 'ENS_NAME_FOUND', name: ENSName })
         })
-        .catch(() => {})
+        .catch()
+
       return () => {
         stale = true
       }

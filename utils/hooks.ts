@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react'
-import { provider } from '.'
+import { getENSName, provider } from '.'
 
 export function useENSName(address: string | undefined) {
   const [ENS, setENS] = useState<string | undefined>(undefined)
   useEffect(() => {
     if (address) {
       let stale = false
-      provider
-        .lookupAddress(address)
+
+      getENSName(address)
         .then((ENSName) => {
           if (!stale && ENSName) setENS(ENSName)
         })
         .catch()
+
       return () => {
         stale = true
         setENS(undefined)
