@@ -8,7 +8,7 @@ import { DelegationTree } from '../components/DelegationTree'
 import styles from '../styles/Home.module.css'
 import { tryGetAddress } from '../utils'
 
-const ADDRESS_PLACEHOLDER = 'x'
+const ADDRESS_PLACEHOLDER = '0x'
 
 export default function Home() {
   const router = useRouter()

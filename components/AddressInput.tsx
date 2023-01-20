@@ -15,19 +15,21 @@ interface SET_VALUE {
 
 interface ENS_NAME_FOUND {
   type: 'ENS_NAME_FOUND'
+  address: string
   name: string
 }
 
 function reducer(
-  _: ReducerState,
+  state: ReducerState,
   action: SET_VALUE | ENS_NAME_FOUND
 ): ReducerState {
   switch (action.type) {
     case 'SET_VALUE': {
+      if (state.value === action.value) return state
       return { value: action.value }
     }
     case 'ENS_NAME_FOUND': {
-      return { value: action.name, ENSName: action.name }
+      return { value: action.address, ENSName: action.name }
     }
   }
 }
@@ -45,53 +47,72 @@ export function AddressInput({
     value: parentAddress ?? '',
   })
 
-  // ensure that typed addresses propagate,
-  // and that typed addresses have their ENS looked up,
-  // and that parentAddresses have their ENS looked up
+  // console.log(value)
+  // sync input state with parentAddress from the url
   useEffect(() => {
-    const address = tryGetAddress(value.length === 0 ? parentAddress : value)
-    if (address) {
-      if (address !== parentAddress) setParentAddress(address)
-      let stale = false
+    dispatch({ type: 'SET_VALUE', value: parentAddress ?? '' })
+  }, [parentAddress])
 
+  // sync parentAddress with input state
+  // useEffect(() => {
+  //   if (value === '' && parentAddress) {
+  //     setParentAddress(undefined)
+  //   } else {
+  //     const address = tryGetAddress(value)
+  //     if (address && address !== parentAddress) setParentAddress(address)
+  //   }
+  // }, [value, parentAddress, setParentAddress])
+
+  // sync input state with typed values
+  function handler(event: FormEvent<HTMLInputElement>) {
+    const value = event.currentTarget.value
+    if (value === '') return setParentAddress(undefined)
+    const address = tryGetAddress(value)
+    if (address) return setParentAddress(address)
+    dispatch({ type: 'SET_VALUE', value: value })
+  }
+
+  // ensure that addresses have their ENS looked up
+  useEffect(() => {
+    const address = tryGetAddress(value)
+    if (address && !ENSName) {
+      let stale = false
       getENSName(address)
         .then((ENSName) => {
           if (!stale && ENSName)
-            dispatch({ type: 'ENS_NAME_FOUND', name: ENSName })
+            dispatch({ type: 'ENS_NAME_FOUND', address, name: ENSName })
         })
         .catch()
+      return () => {
+        stale = true
+      }
+    }
+  }, [value, ENSName])
 
+  // ensure that typed ENS names propagate
+  useEffect(() => {
+    let stale = false
+    if (value.includes('.')) {
+      provider
+        .resolveName(value)
+        .then((resolvedAddress) => {
+          if (!stale && resolvedAddress && resolvedAddress !== value) {
+            setParentAddress(resolvedAddress)
+            dispatch({
+              type: 'ENS_NAME_FOUND',
+              address: resolvedAddress,
+              name: value,
+            })
+          }
+        })
+        .catch()
       return () => {
         stale = true
       }
     }
   }, [value, parentAddress, setParentAddress])
 
-  // ensure that typed ENS names propagate
-  useEffect(() => {
-    let stale = false
-    provider
-      .resolveName(value)
-      .then((address) => {
-        if (!stale && address) {
-          if (address !== parentAddress) setParentAddress(address)
-          dispatch({ type: 'ENS_NAME_FOUND', name: value })
-        }
-      })
-      .catch(() => {})
-    return () => {
-      stale = true
-    }
-  }, [value, parentAddress, setParentAddress])
-
-  function handler(event: FormEvent<HTMLInputElement>) {
-    const value = event.currentTarget.value
-    if (value === '') setParentAddress(undefined)
-    const address = tryGetAddress(value)
-    dispatch({ type: 'SET_VALUE', value: address ?? value })
-  }
-
-  const displayValue = ENSName ?? value.length > 0 ? value : parentAddress ?? ''
+  const displayValue = ENSName ?? value
   const displayAddress = tryGetAddress(displayValue)
 
   const Icon =
